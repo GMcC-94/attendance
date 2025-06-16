@@ -4,12 +4,16 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gmcc94/attendance-go/config"
 	"github.com/gmcc94/attendance-go/db"
 	"github.com/gmcc94/attendance-go/handlers"
 	"github.com/gorilla/mux"
 )
 
 func main() {
+
+	config.LoadConfig()
+
 	db := db.InitDB()
 	defer db.Close()
 
