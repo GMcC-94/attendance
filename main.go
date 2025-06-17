@@ -20,6 +20,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/signup", handlers.SignupHandler(db)).Methods("POST")
 	r.HandleFunc("/login", handlers.LoginHandler(db)).Methods("POST")
+	r.HandleFunc("/students", handlers.CreateStudentHandler(db)).Methods("POST")
+	r.HandleFunc("/students", handlers.GetAllStudentsHandler(db)).Methods("GET")
 
 	log.Println("Server starting on port :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
