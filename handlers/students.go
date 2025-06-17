@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -27,6 +28,7 @@ func CreateStudentHandler(db *sql.DB) http.HandlerFunc {
 
 		err = studentDB.CreateStudent(db, req.Name, req.BeltGrade, dob)
 		if err != nil {
+			log.Printf("Failed to create student %s", err)
 			http.Error(w, "Failed to create student", http.StatusInternalServerError)
 			return
 		}
@@ -51,10 +53,11 @@ func GetAllStudentsHandler(db *sql.DB) http.HandlerFunc {
 		var response []types.StudentResponse
 		for _, s := range students {
 			response = append(response, types.StudentResponse{
-				ID:   s.ID,
-				Name: s.Name,
-				DOB:  s.DateOfBirth.Format("02/01/2006"),
-				Age:  helpers.CalculateAge(s.DateOfBirth),
+				ID:        s.ID,
+				Name:      s.Name,
+				BeltGrade: s.BeltGrade,
+				DOB:       s.DateOfBirth.Format("02/01/2006"),
+				Age:       helpers.CalculateAge(s.DateOfBirth),
 			})
 		}
 		w.Header().Set("Content-Type", "application/json")

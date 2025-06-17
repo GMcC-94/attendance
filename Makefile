@@ -2,7 +2,7 @@ include .env
 export
 
 # Environment Variables
-DB_URL=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
+DB_URL=postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 GOOSE=goose -dir ./migrations postgres "$(DB_URL)"
 
 # Targets
@@ -27,6 +27,10 @@ migrate-down:
 ## Show migration status
 migrate-status:
 	$(GOOSE) status
+
+## Fix migration files
+migrate-fix:
+	$(GOOSE) fix
 
 ## Create a new migration (Usage: make new-migration name=create_students_table)
 new-migration:

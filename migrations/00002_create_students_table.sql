@@ -1,6 +1,4 @@
 -- +goose Up
--- +goose StatementBegin
-SELECT 'up SQL query';
 CREATE TABLE IF NOT EXISTS students (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -9,6 +7,4 @@ CREATE TABLE IF NOT EXISTS students (
 );
 
 -- +goose Down
--- +goose StatementBegin
-SELECT 'down SQL query';
 DROP TABLE IF EXISTS students;

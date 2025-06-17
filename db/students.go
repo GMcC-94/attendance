@@ -8,7 +8,7 @@ import (
 )
 
 func CreateStudent(db *sql.DB, name, beltGrade string, dateOfBirth time.Time) error {
-	_, err := db.Exec("INSERT INTO users (name, belt_grade, dob) VALUES ($1, $2, $3)", name, beltGrade, dateOfBirth)
+	_, err := db.Exec("INSERT INTO students (name, belt_grade, dob) VALUES ($1, $2, $3)", name, beltGrade, dateOfBirth)
 
 	return err
 }
