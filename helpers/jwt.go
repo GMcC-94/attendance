@@ -1,30 +1,41 @@
 package helpers
 
 import (
+	"errors"
 	"time"
 
 	"github.com/gmcc94/attendance-go/config"
+	"github.com/gmcc94/attendance-go/types"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateJWT(username string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": username,
-		"exp":      time.Now().Add(24 * time.Hour).Unix(),
-	})
+func GenerateJWT(userID int, expiry time.Duration) (string, error) {
+	claims := types.Claims{
+		UserID: userID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiry)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, err := token.SignedString([]byte(config.AppConfig.JWTSecret))
 	return tokenString, err
 }
 
-func ValidateJWT(tokenString string) (string, error) {
-	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+func ValidateJWT(tokenString string) (int, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &types.Claims{}, func(t *jwt.Token) (interface{}, error) {
 		return []byte(config.AppConfig.JWTSecret), nil
 	})
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return claims["username"].(string), nil
+	if err != nil {
+		return 0, nil
 	}
 
-	return "", err
+	claims, ok := token.Claims.(*types.Claims)
+	if !ok || token.Valid {
+		return 0, errors.New("invalid token")
+	}
+
+	return claims.UserID, nil
 }
