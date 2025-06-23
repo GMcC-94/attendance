@@ -6,23 +6,16 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gmcc94/attendance-go/db"
+	"github.com/go-chi/chi/v5"
 )
 
-func AddAttendanceHandler(database *sql.DB) http.HandlerFunc {
+func CreateAttendanceHandler(database *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// Extract student ID from URL
-		pathParts := strings.Split(r.URL.Path, "/")
-		if len(pathParts) < 4 {
-			http.Error(w, "Invalid URL format", http.StatusBadRequest)
-			return
-		}
-
-		studentIDStr := pathParts[2]
+		studentIDStr := chi.URLParam(r, "id")
 		studentID, err := strconv.Atoi(studentIDStr)
 		if err != nil {
 			http.Error(w, "Invalid student ID", http.StatusBadRequest)

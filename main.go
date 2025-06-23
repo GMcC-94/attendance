@@ -7,7 +7,7 @@ import (
 	"github.com/gmcc94/attendance-go/config"
 	"github.com/gmcc94/attendance-go/db"
 	"github.com/gmcc94/attendance-go/handlers"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {
@@ -17,11 +17,15 @@ func main() {
 	db := db.InitDB()
 	defer db.Close()
 
-	r := mux.NewRouter()
-	r.HandleFunc("/signup", handlers.SignupHandler(db)).Methods("POST")
-	r.HandleFunc("/login", handlers.LoginHandler(db)).Methods("POST")
-	r.HandleFunc("/students", handlers.CreateStudentHandler(db)).Methods("POST")
-	r.HandleFunc("/students", handlers.GetAllStudentsHandler(db)).Methods("GET")
+	r := chi.NewRouter()
+
+	// Auth Routes
+	r.Post("/signup", handlers.SignupHandler(db))
+	r.Post("/login", handlers.LoginHandler(db))
+
+	// Student Routes
+	r.Post("/students", handlers.CreateStudentHandler(db))
+	r.Get("/students", handlers.GetAllStudentsHandler(db))
 
 	log.Println("Server starting on port :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
