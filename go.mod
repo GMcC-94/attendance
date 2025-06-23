@@ -6,6 +6,7 @@ require github.com/pressly/goose/v3 v3.24.3
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
+	github.com/go-chi/chi/v5 v5.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 )
 

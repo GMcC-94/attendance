@@ -22,3 +22,6 @@ type StudentResponse struct {
 	DOB       string `json:"dob"`
 	Age       int    `json:"age"`
 }
+
+type StudentAttendance struct {
+}

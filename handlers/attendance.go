@@ -29,6 +29,21 @@ func AddAttendanceHandler(database *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		var req struct {
+			AttendedDays []string `json:"attendedDays"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+			return
+		}
+
+		allowedDays := map[string]bool{
+			"Monday":    true,
+			"Tuesday":   true,
+			"Wednesday": true,
+			"Friday":    true,
+		}
+
 		// TODO: move to a helper func as code will be reused
 		loc, err := time.LoadLocation("Europe/Dublin")
 		if err != nil {
@@ -40,30 +55,24 @@ func AddAttendanceHandler(database *sql.DB) http.HandlerFunc {
 		now := time.Now().In(loc)
 		currentDay := now.Weekday().String()
 
-		allowedDays := map[string]bool{
-			"Monday":    true,
-			"Tuesday":   true,
-			"Wednesday": true,
-			"Friday":    true,
-		}
+		for _, day := range req.AttendedDays {
+			if !allowedDays[day] {
+				http.Error(w, "Attendance cannot be taken for the current day", http.StatusForbidden)
+				return
+			}
 
-		if !allowedDays[currentDay] {
-			http.Error(w, "Attendance cannot be taken for the current day", http.StatusForbidden)
-			return
-		}
-
-		err = db.InsertAttendance(database, studentID, now, currentDay)
-		if err != nil {
-			log.Printf("Failed to add attendance: %v", err)
-			http.Error(w, "Failed to add attendance", http.StatusInternalServerError)
-			return
+			err = db.InsertAttendance(database, studentID, now, currentDay)
+			if err != nil {
+				log.Printf("Failed to add attendance: %v", err)
+				http.Error(w, "Failed to add attendance", http.StatusInternalServerError)
+				return
+			}
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{
 			"message": "Attendance taken successfully",
 			"date":    now.Format("02/01/2006"),
-			"day":     currentDay,
 		})
 	}
 }
