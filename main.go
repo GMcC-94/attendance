@@ -27,6 +27,9 @@ func main() {
 	r.Post("/students", handlers.CreateStudentHandler(db))
 	r.Get("/students", handlers.GetAllStudentsHandler(db))
 
+	// Attendance Routes
+	r.Post("/students/{id}/attendance", handlers.CreateAttendanceHandler(db))
+
 	log.Println("Server starting on port :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
