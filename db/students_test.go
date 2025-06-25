@@ -6,16 +6,18 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	studentDB "github.com/gmcc94/attendance-go/db"
+	"github.com/gmcc94/attendance-go/db"
 	"github.com/gmcc94/attendance-go/types"
 )
 
 func TestCreateStudent(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("Failed to open sqlmock DB: %s", err)
 	}
-	defer db.Close()
+	defer sqlDB.Close()
+
+	studentStore := &db.PostgresStudentStore{DB: sqlDB}
 
 	name := "Gerard McCann"
 	beltGrade := "Green Belt"
@@ -25,7 +27,7 @@ func TestCreateStudent(t *testing.T) {
 		WithArgs(name, beltGrade, dob).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = studentDB.CreateStudent(db, name, beltGrade, dob)
+	err = studentStore.CreateStudent(name, beltGrade, dob)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
 	}
@@ -36,11 +38,13 @@ func TestCreateStudent(t *testing.T) {
 }
 
 func TestGetAllStudents(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("Failed to open sqlmock DB: %s", err)
 	}
-	defer db.Close()
+	defer sqlDB.Close()
+
+	studentStore := &db.PostgresStudentStore{DB: sqlDB}
 
 	rows := sqlmock.NewRows([]string{"id", "name", "belt_grade", "dob"}).
 		AddRow(1, "John McTasney", "6th Dan Black Belt", time.Date(1994, 7, 19, 0, 0, 0, 0, time.Local)).
@@ -49,7 +53,7 @@ func TestGetAllStudents(t *testing.T) {
 	mock.ExpectQuery(regexp.QuoteMeta("SELECT id, name, belt_grade, dob FROM students")).
 		WillReturnRows(rows)
 
-	students, err := studentDB.GetAllStudents(db)
+	students, err := studentStore.GetAllStudents()
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
 	}

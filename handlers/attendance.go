@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -12,7 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func CreateAttendanceHandler(database *sql.DB) http.HandlerFunc {
+func CreateAttendanceHandler(attendanceStore db.AttendanceStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		studentIDStr := chi.URLParam(r, "id")
@@ -54,7 +53,7 @@ func CreateAttendanceHandler(database *sql.DB) http.HandlerFunc {
 				return
 			}
 
-			err = db.InsertAttendance(database, studentID, now, currentDay)
+			err = attendanceStore.InsertAttendance(studentID, now, currentDay)
 			if err != nil {
 				log.Printf("Failed to add attendance: %v", err)
 				http.Error(w, "Failed to add attendance", http.StatusInternalServerError)

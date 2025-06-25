@@ -14,21 +14,25 @@ func main() {
 
 	config.LoadConfig()
 
-	db := db.InitDB()
-	defer db.Close()
+	sqlDB := db.InitDB()
+	defer sqlDB.Close()
 
+	userStore := &db.PostgresUserStore{DB: sqlDB}
+	refreshTokenStore := &db.PostgresRefreshTokenStore{DB: sqlDB}
+	studentStore := &db.PostgresStudentStore{DB: sqlDB}
+	attendanceStore := &db.PostgresAttendanceStore{DB: sqlDB}
 	r := chi.NewRouter()
 
 	// Auth Routes
-	r.Post("/signup", handlers.SignupHandler(db))
-	r.Post("/login", handlers.LoginHandler(db))
+	r.Post("/signup", handlers.SignupHandler(userStore))
+	r.Post("/login", handlers.LoginHandler(userStore, refreshTokenStore))
 
 	// Student Routes
-	r.Post("/students", handlers.CreateStudentHandler(db))
-	r.Get("/students", handlers.GetAllStudentsHandler(db))
+	r.Post("/students", handlers.CreateStudentHandler(studentStore))
+	r.Get("/students", handlers.GetAllStudentsHandler(studentStore))
 
 	// Attendance Routes
-	r.Post("/students/{id}/attendance", handlers.CreateAttendanceHandler(db))
+	r.Post("/students/{id}/attendance", handlers.CreateAttendanceHandler(attendanceStore))
 
 	log.Println("Server starting on port :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))

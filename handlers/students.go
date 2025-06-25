@@ -1,18 +1,17 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 	"time"
 
-	studentDB "github.com/gmcc94/attendance-go/db"
+	"github.com/gmcc94/attendance-go/db"
 	"github.com/gmcc94/attendance-go/helpers"
 	"github.com/gmcc94/attendance-go/types"
 )
 
-func CreateStudentHandler(db *sql.DB) http.HandlerFunc {
+func CreateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.CreateStudentRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -26,7 +25,7 @@ func CreateStudentHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		err = studentDB.CreateStudent(db, req.Name, req.BeltGrade, dob)
+		err = studentStore.CreateStudent(req.Name, req.BeltGrade, dob)
 		if err != nil {
 			log.Printf("Failed to create student %s", err)
 			http.Error(w, "Failed to create student", http.StatusInternalServerError)
@@ -42,9 +41,9 @@ func CreateStudentHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func GetAllStudentsHandler(db *sql.DB) http.HandlerFunc {
+func GetAllStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		students, err := studentDB.GetAllStudents(db)
+		students, err := studentStore.GetAllStudents()
 		if err != nil {
 			http.Error(w, "Failed to fetch all students", http.StatusInternalServerError)
 			return

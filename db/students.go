@@ -7,14 +7,23 @@ import (
 	"github.com/gmcc94/attendance-go/types"
 )
 
-func CreateStudent(db *sql.DB, name, beltGrade string, dateOfBirth time.Time) error {
-	_, err := db.Exec("INSERT INTO students (name, belt_grade, dob) VALUES ($1, $2, $3)", name, beltGrade, dateOfBirth)
+type StudentStore interface {
+	CreateStudent(name, beltGrade string, dateofBirth time.Time) error
+	GetAllStudents() ([]types.Students, error)
+}
+
+type PostgresStudentStore struct {
+	DB *sql.DB
+}
+
+func (p *PostgresStudentStore) CreateStudent(name, beltGrade string, dateOfBirth time.Time) error {
+	_, err := p.DB.Exec("INSERT INTO students (name, belt_grade, dob) VALUES ($1, $2, $3)", name, beltGrade, dateOfBirth)
 
 	return err
 }
 
-func GetAllStudents(db *sql.DB) ([]types.Students, error) {
-	rows, err := db.Query("SELECT id, name, belt_grade, dob FROM students")
+func (p *PostgresStudentStore) GetAllStudents() ([]types.Students, error) {
+	rows, err := p.DB.Query("SELECT id, name, belt_grade, dob FROM students")
 	if err != nil {
 		return nil, err
 	}

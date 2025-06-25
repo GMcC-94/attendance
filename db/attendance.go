@@ -5,8 +5,16 @@ import (
 	"time"
 )
 
-func InsertAttendance(db *sql.DB, studentID int, date time.Time, dayOfWeek string) error {
-	_, err := db.Exec("INSERT into attendance (student_id, date, day_of_week) VALUES ($1, $2, $2)",
+type AttendanceStore interface {
+	InsertAttendance(studentID int, date time.Time, dayOfWeek string) error
+}
+
+type PostgresAttendanceStore struct {
+	DB *sql.DB
+}
+
+func (p *PostgresAttendanceStore) InsertAttendance(studentID int, date time.Time, dayOfWeek string) error {
+	_, err := p.DB.Exec("INSERT into attendance (student_id, date, day_of_week) VALUES ($1, $2, $2)",
 		studentID,
 		date,
 		dayOfWeek)

@@ -7,27 +7,42 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func SignupUser(db *sql.DB, username, password string) error {
+type UserStore interface {
+	SignupUser(username, password string) (int, error)
+	AuthenticateUser(username, password string) (int, error)
+}
+
+type PostgresUserStore struct {
+	DB *sql.DB
+}
+
+func (p *PostgresUserStore) SignupUser(username, password string) (int, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("error: Hashing Password %v", hashedPassword)
 	}
 
-	_, err = db.Exec("INSERT INTO users (username, password_hash) VALUES ($1, $2)", username, string(hashedPassword))
-	return err
+	var userID int
+	err = p.DB.QueryRow("INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id", username, string(hashedPassword)).
+		Scan(&userID)
+	if err != nil {
+		log.Printf("error: Inserting user %v", err)
+	}
+	return userID, nil
 }
 
-func AuthenticateUser(db *sql.DB, username, password string) (bool, error) {
+func (p *PostgresUserStore) AuthenticateUser(username, password string) (int, error) {
+	var userID int
 	var hashedPassword string
-	err := db.QueryRow("SELECT password_hash FROM users WHERE username = $1", username).Scan(&hashedPassword)
+	err := p.DB.QueryRow("SELECT id, password_hash FROM users WHERE username = $1", username).Scan(&userID, &hashedPassword)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
-		return false, nil
+		return 0, nil
 	}
 
-	return true, nil
+	return userID, nil
 }
