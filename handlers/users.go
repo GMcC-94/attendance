@@ -79,7 +79,9 @@ func LoginHandler(
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{
+			"message":       "User successfully logged in",
 			"access_token":  accessToken,
-			"refresh_token": refreshToken})
+			"refresh_token": refreshToken,
+		})
 	}
 }

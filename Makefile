@@ -22,7 +22,7 @@ migrate-up:
 
 ## Rollback last migration
 migrate-down:
-	$(GOOSE) down
+	$(GOOSE) down 1
 
 ## Show migration status
 migrate-status:

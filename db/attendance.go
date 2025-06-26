@@ -14,7 +14,7 @@ type PostgresAttendanceStore struct {
 }
 
 func (p *PostgresAttendanceStore) InsertAttendance(studentID int, date time.Time, dayOfWeek string) error {
-	_, err := p.DB.Exec("INSERT into attendance (student_id, date, day_of_week) VALUES ($1, $2, $2)",
+	_, err := p.DB.Exec("INSERT into attendanceS (student_id, attendance_date, class_day) VALUES ($1, $2, $3)",
 		studentID,
 		date,
 		dayOfWeek)
