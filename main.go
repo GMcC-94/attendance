@@ -34,6 +34,7 @@ func main() {
 
 		// Attendance Routes
 		r.Post("/students/{id}/attendance", handlers.CreateAttendanceHandler(attendanceStore))
+		r.Get("/students/{id}/attendance", handlers.GetStudentAttendanceByIDHandler(attendanceStore))
 	})
 
 	log.Println("Server starting on port :8080")

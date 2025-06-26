@@ -68,8 +68,11 @@ func TestGetAllStudents(t *testing.T) {
 	}
 
 	for i, student := range students {
-		if student != expected[i] {
-			t.Errorf("Expected student %v, got %v", expected[i], student)
+		if student.ID != expected[i].ID ||
+			student.Name != expected[i].Name ||
+			student.BeltGrade != expected[i].BeltGrade ||
+			!student.DateOfBirth.Equal(expected[i].DateOfBirth) {
+			t.Errorf("Student mismatch at index %d:\nExpected: %+v\nGot:      %+v", i, expected[i], student)
 		}
 	}
 

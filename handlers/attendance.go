@@ -71,3 +71,26 @@ func CreateAttendanceHandler(attendanceStore db.AttendanceStore) http.HandlerFun
 		})
 	}
 }
+
+func GetStudentAttendanceByIDHandler(attendanceStore db.AttendanceStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		studentIDStr := chi.URLParam(r, "id")
+		studentID, err := strconv.Atoi(studentIDStr)
+		if err != nil {
+			http.Error(w, "Invalid student ID", http.StatusBadRequest)
+			log.Printf("error with student ID %v", err)
+			return
+		}
+
+		attendanceResp, err := attendanceStore.GetStudentAttendanceByID(studentID)
+		if err != nil {
+			http.Error(w, "Failed to fetch student attendance", http.StatusInternalServerError)
+			log.Printf("Failed to fetch attendance: %v", err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(attendanceResp)
+	}
+}

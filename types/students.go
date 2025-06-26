@@ -16,12 +16,24 @@ type CreateStudentRequest struct {
 }
 
 type StudentResponse struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
-	BeltGrade string `json:"beltGrade"`
-	DOB       string `json:"dob"`
-	Age       int    `json:"age"`
+	ID         int                 `json:"id"`
+	Name       string              `json:"name"`
+	BeltGrade  string              `json:"beltGrade"`
+	DOB        string              `json:"dob"`
+	Age        int                 `json:"age"`
+	Attendance []StudentAttendance `json:"attendance"`
 }
 
 type StudentAttendance struct {
+	Date     string `json:"date"`
+	ClassDay string `json:"classDay"`
+}
+
+type StudentAttendanceResponse struct {
+	ID         int                 `json:"id"`
+	Name       string              `json:"name"`
+	BeltGrade  string              `json:"beltGrade"`
+	DOB        string              `json:"dob"`
+	Age        int                 `json:"age"`
+	Attendance []StudentAttendance `json:"attendance"`
 }
