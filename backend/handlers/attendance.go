@@ -18,26 +18,10 @@ func CreateAttendanceHandler(attendanceStore db.AttendanceStore) http.HandlerFun
 		studentID, err := strconv.Atoi(studentIDStr)
 		if err != nil {
 			http.Error(w, "Invalid student ID", http.StatusBadRequest)
-			log.Printf("error with student ID %v", err)
+			log.Printf("Error with student ID: %v", err)
 			return
 		}
 
-		var req struct {
-			AttendedDays []string `json:"attendedDays"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid input", http.StatusBadRequest)
-			return
-		}
-
-		allowedDays := map[string]bool{
-			"Monday":    true,
-			"Tuesday":   true,
-			"Wednesday": true,
-			"Friday":    true,
-		}
-
-		// TODO: move to a helper func as code will be reused
 		loc, err := time.LoadLocation("Europe/Dublin")
 		if err != nil {
 			log.Printf("Failed to load timezone: %v", err)
@@ -46,28 +30,34 @@ func CreateAttendanceHandler(attendanceStore db.AttendanceStore) http.HandlerFun
 		}
 
 		now := time.Now().In(loc)
-		dateOnly := now.Truncate(24 * time.Hour) // returns time.Time with 00:00:00 time
-
+		dateOnly := now.Truncate(24 * time.Hour)
 		currentDay := now.Weekday().String()
 
-		for _, day := range req.AttendedDays {
-			if !allowedDays[day] {
-				http.Error(w, "Attendance cannot be taken for the current day", http.StatusForbidden)
-				return
-			}
+		allowedDays := map[string]bool{
+			"Monday":    true,
+			"Tuesday":   true,
+			"Wednesday": true,
+			"Friday":    true,
+		}
 
-			err = attendanceStore.InsertAttendance(studentID, dateOnly, currentDay)
-			if err != nil {
-				log.Printf("Failed to add attendance: %v", err)
-				http.Error(w, "Failed to add attendance", http.StatusInternalServerError)
-				return
-			}
+		if !allowedDays[currentDay] {
+			http.Error(w, "No class on this day", http.StatusForbidden)
+			return
+		}
+
+		// Insert attendance
+		err = attendanceStore.InsertAttendance(studentID, dateOnly, currentDay)
+		if err != nil {
+			log.Printf("Failed to add attendance: %v", err)
+			http.Error(w, "Failed to add attendance", http.StatusInternalServerError)
+			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{
-			"message": "Attendance taken successfully",
+			"message": "Attendance recorded successfully",
 			"date":    now.Format("02/01/2006"),
+			"day":     currentDay,
 		})
 	}
 }
