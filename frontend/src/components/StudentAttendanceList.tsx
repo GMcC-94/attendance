@@ -18,7 +18,7 @@ const StudentAttendanceList: React.FC = () => {
   useEffect(() => {
     axios.get('/api/v1/students')
       .then(res => {
-        console.log("Fetched students:", res.data); // ✅ ADD THIS LINE
+        console.log("Fetched students:", res.data); 
         if (Array.isArray(res.data)) {
           setStudents(res.data);
         } else {
@@ -35,7 +35,7 @@ const StudentAttendanceList: React.FC = () => {
     }
 
     try {
-      await axios.post(`/app/v1/students/${studentId}/attendance`, {
+      await axios.post(`/api/v1/students/${studentId}/attendance`, {
         attendedDays: [currentDay],
       });
       setMarked(prev => ({ ...prev, [studentId]: true }));
