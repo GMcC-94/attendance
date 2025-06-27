@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 interface Student {
   id: number;
   name: string;
@@ -45,38 +46,30 @@ const StudentAttendanceList: React.FC = () => {
     }
   };
 
- return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center">Take Attendance for {currentDay}</h1>
-      <table className="min-w-full table-auto border-collapse border border-gray-300 shadow-sm rounded-md">
+  return (
+    <div className="p-4 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Take Attendance for {currentDay}</h1>
+      <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border border-gray-300 px-6 py-3 text-left">Name</th>
-            <th className="border border-gray-300 px-6 py-3 text-center">Present</th>
+            <th className="text-left py-2 px-4">Student Name</th>
+            <th className="text-left py-2 px-4">Mark</th>
           </tr>
         </thead>
         <tbody>
-          {students.map(student => (
-            <tr key={student.id} className="even:bg-gray-50 hover:bg-gray-100">
-              <td className="border border-gray-300 px-6 py-3">{student.name}</td>
-              <td className="border border-gray-300 px-6 py-3 text-center">
+          {students.map((student) => (
+            <tr key={student.id} className="border-b">
+              <td className="py-2 px-4">{student.name}</td>
+              <td className="py-2 px-4">
                 <input
                   type="checkbox"
-                  checked={!!marked[student.id]}
-                  disabled={!!marked[student.id]}
+                  disabled={marked[student.id]}
+                  checked={marked[student.id] || false}
                   onChange={() => handleAttendance(student.id)}
-                  className="cursor-pointer w-5 h-5"
                 />
               </td>
             </tr>
           ))}
-          {students.length === 0 && (
-            <tr>
-              <td colSpan={2} className="text-center py-6 text-gray-500">
-                No students found.
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
     </div>

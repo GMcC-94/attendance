@@ -1,16 +1,24 @@
 import './App.css'
-import StudentAttendanceList from './components/StudentAttendanceList'
-import Navbar from './components/Navbar';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import "tailwindcss";
+import './index.css'
+import StudentList from './pages/StudentList';
+import Layout from './components/Layout';
+import StudentAttendanceList from './components/StudentAttendanceList';
 
 function App() {
-  //const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <Navbar />
-      <StudentAttendanceList />
-    </>
-  )
-}
+return (
+   <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="attendance" element={<StudentAttendanceList />} />
+          <Route path="students" element={<StudentList />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
+};
 
-export default App
+export default App;
+
