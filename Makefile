@@ -10,7 +10,7 @@ GOOSE=goose -dir ./migrations postgres "$(DB_URL)"
 
 ## Run the Go server
 run:
-	go run main.go
+	@cd backend && go run main.go
 
 ## Build the Go server
 build:

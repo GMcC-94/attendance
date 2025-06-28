@@ -2,6 +2,10 @@ package db
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
+	"log"
+	"strings"
 	"time"
 
 	"github.com/gmcc94/attendance-go/types"
@@ -10,6 +14,8 @@ import (
 type StudentStore interface {
 	CreateStudent(name, beltGrade string, dateofBirth time.Time) error
 	GetAllStudents() ([]types.Students, error)
+	GetStudentByID(studentID int) (types.Students, error)
+	UpdateStudent(studentID int, name, beltGrade *string) (types.Students, error)
 }
 
 type PostgresStudentStore struct {
@@ -39,4 +45,50 @@ func (p *PostgresStudentStore) GetAllStudents() ([]types.Students, error) {
 		students = append(students, s)
 	}
 	return students, nil
+}
+
+func (p *PostgresStudentStore) GetStudentByID(studentID int) (types.Students, error) {
+	var student types.Students
+
+	row := p.DB.QueryRow(`
+	SELECT name, belt_grade, dob
+	FROM students
+	WHERE id = $1;`, studentID)
+	err := row.Scan(&student.Name, &student.BeltGrade, &student.DateOfBirth)
+	if errors.Is(err, sql.ErrNoRows) {
+		return types.Students{}, fmt.Errorf("query student by id: %w", err)
+	}
+
+	return student, nil
+}
+
+func (p *PostgresStudentStore) UpdateStudent(studentID int, name, beltGrade *string) (types.Students, error) {
+	setClauses := []string{}
+	args := []interface{}{studentID}
+	argPos := 2
+
+	if name != nil {
+		setClauses = append(setClauses, fmt.Sprintf("name = $%d", argPos))
+		args = append(args, *name)
+		argPos++
+	}
+	if beltGrade != nil {
+		setClauses = append(setClauses, fmt.Sprintf("belt_grade = $%d", argPos))
+		args = append(args, *beltGrade)
+		argPos++
+	}
+
+	if len(setClauses) == 0 {
+		return types.Students{}, fmt.Errorf("no fields to update")
+	}
+
+	query := fmt.Sprintf("UPDATE students SET %s WHERE id = $1", strings.Join(setClauses, ", "))
+
+	_, err := p.DB.Exec(query, args...)
+	if err != nil {
+		log.Printf("error updating student: %v", err)
+		return types.Students{}, err
+	}
+
+	return types.Students{ID: studentID}, nil
 }

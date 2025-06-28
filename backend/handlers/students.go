@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gmcc94/attendance-go/db"
 	"github.com/gmcc94/attendance-go/helpers"
 	"github.com/gmcc94/attendance-go/types"
+	"github.com/go-chi/chi/v5"
 )
 
 func CreateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
@@ -61,5 +63,50 @@ func GetAllStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
+	}
+}
+
+func UpdateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		studentIDStr := chi.URLParam(r, "studentID")
+		studentID, err := strconv.Atoi(studentIDStr)
+		if err != nil {
+			http.Error(w, "Invalid student ID", http.StatusBadRequest)
+			log.Printf("error with student ID %v", err)
+			return
+		}
+
+		var req struct {
+			Name      *string `json:"name"`
+			BeltGrade *string `json:"beltGrade"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+			log.Printf("invalid JSON body %v", err)
+			return
+		}
+
+		if req.Name == nil && req.BeltGrade == nil {
+			http.Error(w, "No fields provided to update", http.StatusBadRequest)
+			return
+		}
+
+		_, err = studentStore.UpdateStudent(studentID, req.Name, req.BeltGrade)
+		if err != nil {
+			http.Error(w, "Failed to update student: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		updatedStudent, err := studentStore.GetStudentByID(studentID)
+		if err != nil {
+			http.Error(w, "Failed to fetch updated student: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(updatedStudent)
 	}
 }
