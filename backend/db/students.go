@@ -16,6 +16,7 @@ type StudentStore interface {
 	GetAllStudents() ([]types.Students, error)
 	GetStudentByID(studentID int) (types.Students, error)
 	UpdateStudent(studentID int, name, beltGrade *string) (types.Students, error)
+	DeleteStudent(studentID int) error
 }
 
 type PostgresStudentStore struct {
@@ -91,4 +92,41 @@ func (p *PostgresStudentStore) UpdateStudent(studentID int, name, beltGrade *str
 	}
 
 	return types.Students{ID: studentID}, nil
+}
+
+func (p *PostgresStudentStore) DeleteStudent(studentID int) error {
+	tx, err := p.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(`
+	DELETE FROM attendances
+	WHERE student_id = $1`, studentID)
+	if err != nil {
+		return fmt.Errorf("failed to delete attendances: %w", err)
+	}
+
+	res, err := tx.Exec(`
+	DELETE FROM students
+	WHERE id = $1`, studentID)
+	if err != nil {
+		return fmt.Errorf("failed to delete student: %w", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("could not determine affected rows: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no student found with ID %d", studentID)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
 }

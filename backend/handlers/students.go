@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gmcc94/attendance-go/db"
 	"github.com/gmcc94/attendance-go/helpers"
 	"github.com/gmcc94/attendance-go/types"
-	"github.com/go-chi/chi/v5"
 )
 
 func CreateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
@@ -69,11 +67,9 @@ func GetAllStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
 func UpdateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		studentIDStr := chi.URLParam(r, "studentID")
-		studentID, err := strconv.Atoi(studentIDStr)
+		studentID, err := helpers.GetStudentURLID(r)
 		if err != nil {
 			http.Error(w, "Invalid student ID", http.StatusBadRequest)
-			log.Printf("error with student ID %v", err)
 			return
 		}
 
@@ -108,5 +104,23 @@ func UpdateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(updatedStudent)
+	}
+}
+
+func DeleteStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		studentID, err := helpers.GetStudentURLID(r)
+		if err != nil {
+			http.Error(w, "Invalid student ID", http.StatusBadRequest)
+			return
+		}
+
+		err = studentStore.DeleteStudent(studentID)
+		if err != nil {
+			http.Error(w, "Failed to delete student: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
 }

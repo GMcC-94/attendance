@@ -32,6 +32,7 @@ func main() {
 		r.Post("/students", handlers.CreateStudentHandler(studentStore))
 		r.Get("/students", handlers.GetAllStudentsHandler(studentStore))
 		r.Put("/students/{studentID}", handlers.UpdateStudentHandler(studentStore))
+		r.Delete("/students/{studentID}", handlers.DeleteStudentHandler(studentStore))
 
 		// Attendance Routes
 		r.Post("/students/{studentID}/attendance", handlers.CreateAttendanceHandler(attendanceStore))
