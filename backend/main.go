@@ -21,6 +21,7 @@ func main() {
 	refreshTokenStore := &db.PostgresRefreshTokenStore{DB: sqlDB}
 	studentStore := &db.PostgresStudentStore{DB: sqlDB}
 	attendanceStore := &db.PostgresAttendanceStore{DB: sqlDB}
+
 	r := chi.NewRouter()
 
 	r.Route("/api/v1", func(r chi.Router) {
@@ -31,12 +32,12 @@ func main() {
 		// Student Routes
 		r.Post("/students", handlers.CreateStudentHandler(studentStore))
 		r.Get("/students", handlers.GetAllStudentsHandler(studentStore))
-		r.Put("/students/{studentID}", handlers.UpdateStudentHandler(studentStore))
-		r.Delete("/students/{studentID}", handlers.DeleteStudentHandler(studentStore))
+		r.Put("/students/{id}", handlers.UpdateStudentHandler(studentStore))
+		r.Delete("/students/{id}", handlers.DeleteStudentHandler(studentStore))
 
 		// Attendance Routes
-		r.Post("/students/{studentID}/attendance", handlers.CreateAttendanceHandler(attendanceStore))
-		r.Get("/students/{studentID}/attendance", handlers.GetStudentAttendanceByIDHandler(attendanceStore))
+		r.Post("/students/{id}/attendance", handlers.CreateAttendanceHandler(attendanceStore))
+		r.Get("/students/{id}/attendance", handlers.GetStudentAttendanceByIDHandler(attendanceStore))
 	})
 
 	log.Println("Server starting on port :8080")
