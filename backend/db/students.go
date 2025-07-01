@@ -35,7 +35,7 @@ func (p *PostgresStudentStore) CreateStudent(name, beltGrade string, dateOfBirth
 }
 
 func (p *PostgresStudentStore) GetAllStudents() ([]types.Students, error) {
-	rows, err := p.DB.Query("SELECT id, name, belt_grade, dob FROM students")
+	rows, err := p.DB.Query("SELECT id, name, belt_grade, dob FROM students ORDER BY name ASC;")
 	if err != nil {
 		return nil, err
 	}
