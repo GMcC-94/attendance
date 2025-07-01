@@ -33,6 +33,7 @@ func main() {
 		r.Post("/students", handlers.CreateStudentHandler(studentStore))
 		r.Get("/students", handlers.GetAllStudentsHandler(studentStore))
 		r.Get("/students/adults", handlers.GetAllAdultStudentsHandler(studentStore))
+		r.Get("/students/kids", handlers.GetAllKidStudentsHandler(studentStore))
 		r.Put("/students/{id}", handlers.UpdateStudentHandler(studentStore))
 		r.Delete("/students/{id}", handlers.DeleteStudentHandler(studentStore))
 

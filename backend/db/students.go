@@ -15,6 +15,7 @@ type StudentStore interface {
 	CreateStudent(name, beltGrade, studentType string, dateofBirth time.Time) error
 	GetAllStudents() ([]types.Students, error)
 	GetAllAdultStudents() ([]types.Students, error)
+	GetAllKidStudents() ([]types.Students, error)
 	GetStudentByID(studentID int) (types.Students, error)
 	UpdateStudent(studentID int, name, beltGrade *string) (types.Students, error)
 	DeleteStudent(studentID int) error
@@ -57,7 +58,7 @@ func (p *PostgresStudentStore) GetAllStudents() ([]types.Students, error) {
 
 func (p *PostgresStudentStore) GetAllAdultStudents() ([]types.Students, error) {
 	rows, err := p.DB.Query(`
-	SELECT id, name, belt_grade, dob 
+	SELECT id, name, belt_grade, student_type, dob 
 	FROM students 
 	WHERE student_type = 'adult'
 	ORDER BY name ASC;
@@ -71,7 +72,31 @@ func (p *PostgresStudentStore) GetAllAdultStudents() ([]types.Students, error) {
 	var students []types.Students
 	for rows.Next() {
 		var s types.Students
-		if err := rows.Scan(&s.ID, &s.Name, &s.BeltGrade, &s.DateOfBirth); err != nil {
+		if err := rows.Scan(&s.ID, &s.Name, &s.BeltGrade, &s.StudentType, &s.DateOfBirth); err != nil {
+			return nil, err
+		}
+		students = append(students, s)
+	}
+	return students, nil
+}
+
+func (p *PostgresStudentStore) GetAllKidStudents() ([]types.Students, error) {
+	rows, err := p.DB.Query(`
+	SELECT id, name, belt_grade, student_type, dob 
+	FROM students 
+	WHERE student_type = 'kid'
+	ORDER BY name ASC;
+	`)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var students []types.Students
+	for rows.Next() {
+		var s types.Students
+		if err := rows.Scan(&s.ID, &s.Name, &s.BeltGrade, &s.StudentType, &s.DateOfBirth); err != nil {
 			return nil, err
 		}
 		students = append(students, s)

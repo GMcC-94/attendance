@@ -68,7 +68,32 @@ func GetAllAdultStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		students, err := studentStore.GetAllAdultStudents()
 		if err != nil {
-			log.Printf("failed to fetch students: %v", err)
+			log.Printf("failed to fetch students that are adults: %v", err)
+			http.Error(w, "Failed to fetch all students", http.StatusInternalServerError)
+			return
+		}
+
+		var response []types.StudentResponse
+		for _, s := range students {
+			response = append(response, types.StudentResponse{
+				ID:          s.ID,
+				Name:        s.Name,
+				BeltGrade:   s.BeltGrade,
+				DOB:         s.DateOfBirth.Format("02/01/2006"),
+				Age:         helpers.CalculateAge(s.DateOfBirth),
+				StudentType: s.StudentType,
+			})
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+func GetAllKidStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		students, err := studentStore.GetAllKidStudents()
+		if err != nil {
+			log.Printf("failed to fetch students that are kids: %v", err)
 			http.Error(w, "Failed to fetch all students", http.StatusInternalServerError)
 			return
 		}
@@ -136,7 +161,7 @@ func DeleteStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		studentID, err := helpers.GetStudentURLID(r)
 		if err != nil {
-			log.Printf("invalid student ID %w", err)
+			log.Printf("invalid student ID %v", err)
 			http.Error(w, "Invalid student ID", http.StatusBadRequest)
 			return
 		}

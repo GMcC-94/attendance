@@ -23,7 +23,7 @@ type StudentResponse struct {
 	BeltGrade   string              `json:"beltGrade"`
 	DOB         string              `json:"dob"`
 	Age         int                 `json:"age"`
-	StudentType string              `json"studentType"`
+	StudentType string              `json:"studentType"`
 	Attendance  []StudentAttendance `json:"attendance"`
 }
 
