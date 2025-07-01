@@ -8,4 +8,6 @@ CREATE TABLE IF NOT EXISTS attendances (
 
 
 -- +goose Down
-DROP TABLE IF EXISTS attendance;
+-- +goose StatementBegin
+DROP TABLE IF EXISTS attendances;
+-- +goose StatementEnd

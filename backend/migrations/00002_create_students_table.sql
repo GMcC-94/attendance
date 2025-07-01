@@ -7,4 +7,6 @@ CREATE TABLE IF NOT EXISTS students (
 );
 
 -- +goose Down
+-- +goose StatementBegin
 DROP TABLE IF EXISTS students;
+-- +goose StatementEnd

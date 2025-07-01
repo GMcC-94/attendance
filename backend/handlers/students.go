@@ -25,7 +25,7 @@ func CreateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
 			return
 		}
 
-		err = studentStore.CreateStudent(req.Name, req.BeltGrade, dob)
+		err = studentStore.CreateStudent(req.Name, req.BeltGrade, req.StudentType, dob)
 		if err != nil {
 			log.Printf("Failed to create student %s", err)
 			http.Error(w, "Failed to create student", http.StatusInternalServerError)
@@ -57,6 +57,31 @@ func GetAllStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
 				BeltGrade: s.BeltGrade,
 				DOB:       s.DateOfBirth.Format("02/01/2006"),
 				Age:       helpers.CalculateAge(s.DateOfBirth),
+			})
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+func GetAllAdultStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		students, err := studentStore.GetAllAdultStudents()
+		if err != nil {
+			log.Printf("failed to fetch students: %v", err)
+			http.Error(w, "Failed to fetch all students", http.StatusInternalServerError)
+			return
+		}
+
+		var response []types.StudentResponse
+		for _, s := range students {
+			response = append(response, types.StudentResponse{
+				ID:          s.ID,
+				Name:        s.Name,
+				BeltGrade:   s.BeltGrade,
+				DOB:         s.DateOfBirth.Format("02/01/2006"),
+				Age:         helpers.CalculateAge(s.DateOfBirth),
+				StudentType: s.StudentType,
 			})
 		}
 		w.Header().Set("Content-Type", "application/json")

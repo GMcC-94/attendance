@@ -21,13 +21,14 @@ func TestCreateStudent(t *testing.T) {
 
 	name := "Gerard McCann"
 	beltGrade := "Green Belt"
+	studentType := "Adult"
 	dob := time.Date(1994, 7, 19, 0, 0, 0, 0, time.Local)
 
 	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO students (name, belt_grade, dob) VALUES ($1, $2, $3)")).
 		WithArgs(name, beltGrade, dob).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = studentStore.CreateStudent(name, beltGrade, dob)
+	err = studentStore.CreateStudent(name, beltGrade, studentType, dob)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
 	}

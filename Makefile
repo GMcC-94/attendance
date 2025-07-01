@@ -18,36 +18,40 @@ build:
 
 ## Run migrations up
 migrate-up:
-	$(GOOSE) up
+	cd backend && $(GOOSE) up
 
 ## Rollback last migration
 migrate-down:
-	$(GOOSE) down 1
+	cd backend && $(GOOSE) down 1
 
 ## Show migration status
 migrate-status:
-	$(GOOSE) status
+	cd backend && $(GOOSE) status
 
 ## Fix migration files
 migrate-fix:
-	$(GOOSE) fix
+	cd backend && $(GOOSE) fix
+
+	## Fix migration files
+migrate-reset:
+	cd backend && $(GOOSE) reset
 
 ## Create a new migration (Usage: make new-migration name=create_students_table)
 new-migration:
 	@if [ -z "$(name)" ]; then \
 		echo "Migration name required. Usage: make new-migration name=add_table"; \
 	else \
-		goose -dir ./migrations create $(name) sql; \
+		cd backend && goose -dir ./migrations create $(name) sql; \
 	fi
 
 ## Start Docker containers
 docker-up:
-	docker-compose up -d
+	cd backend && docker-compose up -d
 
 ## Stop Docker containers
 docker-down:
-	docker-compose down
+	cd backend && docker-compose down
 
 ## View Docker logs
 docker-logs:
-	docker-compose logs -f
+	cd backend && docker-compose logs -f

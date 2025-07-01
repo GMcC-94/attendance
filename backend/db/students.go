@@ -12,8 +12,9 @@ import (
 )
 
 type StudentStore interface {
-	CreateStudent(name, beltGrade string, dateofBirth time.Time) error
+	CreateStudent(name, beltGrade, studentType string, dateofBirth time.Time) error
 	GetAllStudents() ([]types.Students, error)
+	GetAllAdultStudents() ([]types.Students, error)
 	GetStudentByID(studentID int) (types.Students, error)
 	UpdateStudent(studentID int, name, beltGrade *string) (types.Students, error)
 	DeleteStudent(studentID int) error
@@ -23,19 +24,44 @@ type PostgresStudentStore struct {
 	DB *sql.DB
 }
 
-// THIS FILE JUST STORES INFORMATION INTO A DATABASE.
-
-// func stands for FUNCTION that is telling the program to do something.
-// In this case, I'm creating a Student for the club and I require there to be a
-// NAME, BELT GRADE AND DATE OF BIRTH FOR A STUDENT
-func (p *PostgresStudentStore) CreateStudent(name, beltGrade string, dateOfBirth time.Time) error {
-	_, err := p.DB.Exec("INSERT INTO students (name, belt_grade, dob) VALUES ($1, $2, $3)", name, beltGrade, dateOfBirth)
+func (p *PostgresStudentStore) CreateStudent(name, beltGrade, studentType string, dateOfBirth time.Time) error {
+	_, err := p.DB.Exec(`
+	INSERT INTO students (name, belt_grade, dob, student_type) 
+	VALUES ($1, $2, $3, $4)`,
+		name,
+		beltGrade,
+		dateOfBirth,
+		studentType)
 
 	return err
 }
 
 func (p *PostgresStudentStore) GetAllStudents() ([]types.Students, error) {
 	rows, err := p.DB.Query("SELECT id, name, belt_grade, dob FROM students ORDER BY name ASC;")
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var students []types.Students
+	for rows.Next() {
+		var s types.Students
+		if err := rows.Scan(&s.ID, &s.Name, &s.BeltGrade, &s.DateOfBirth); err != nil {
+			return nil, err
+		}
+		students = append(students, s)
+	}
+	return students, nil
+}
+
+func (p *PostgresStudentStore) GetAllAdultStudents() ([]types.Students, error) {
+	rows, err := p.DB.Query(`
+	SELECT id, name, belt_grade, dob 
+	FROM students 
+	WHERE student_type = 'adult'
+	ORDER BY name ASC;
+	`)
 	if err != nil {
 		return nil, err
 	}
