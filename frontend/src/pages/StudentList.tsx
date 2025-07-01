@@ -32,8 +32,6 @@ export default function StudentList() {
     fetchStudents();
   }, [filter]);
 
-  
-
   const deleteStudent = async (id: number) => {
     if (!confirm("Are you sure you want to delete this student?")) return;
 

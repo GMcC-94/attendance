@@ -21,6 +21,7 @@ func main() {
 	refreshTokenStore := &db.PostgresRefreshTokenStore{DB: sqlDB}
 	studentStore := &db.PostgresStudentStore{DB: sqlDB}
 	attendanceStore := &db.PostgresAttendanceStore{DB: sqlDB}
+	imageStore := &db.PostgresImageStore{DB: sqlDB}
 
 	r := chi.NewRouter()
 
@@ -40,7 +41,13 @@ func main() {
 		// Attendance Routes
 		r.Post("/students/{id}/attendance", handlers.CreateAttendanceHandler(attendanceStore))
 		r.Get("/students/{id}/attendance", handlers.GetStudentAttendanceByIDHandler(attendanceStore))
+
+		// Image upload
+		r.Post("/upload", handlers.UploadImageHandler(imageStore))
 	})
+
+	fs := http.FileServer(http.Dir("./uploads"))
+	r.Handle("/uploads/", http.StripPrefix("/uploads", fs))
 
 	log.Println("Server starting on port :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
