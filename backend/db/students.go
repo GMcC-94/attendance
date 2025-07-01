@@ -61,8 +61,7 @@ func (p *PostgresStudentStore) GetAllAdultStudents() ([]types.Students, error) {
 	SELECT id, name, belt_grade, student_type, dob 
 	FROM students 
 	WHERE student_type = 'adult'
-	ORDER BY name ASC;
-	`)
+	ORDER BY name ASC;`)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +71,12 @@ func (p *PostgresStudentStore) GetAllAdultStudents() ([]types.Students, error) {
 	var students []types.Students
 	for rows.Next() {
 		var s types.Students
-		if err := rows.Scan(&s.ID, &s.Name, &s.BeltGrade, &s.StudentType, &s.DateOfBirth); err != nil {
+		if err := rows.
+			Scan(&s.ID,
+				&s.Name,
+				&s.BeltGrade,
+				&s.StudentType,
+				&s.DateOfBirth); err != nil {
 			return nil, err
 		}
 		students = append(students, s)

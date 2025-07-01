@@ -7,6 +7,7 @@ const CreateStudentForm: React.FC = () => {
     const [name, setName] = useState('');
     const [beltGrade, setBeltGrade] = useState('');
     const [dob, setDob] = useState('');
+    const [studentType, setStudentType] = useState<'kid' | 'adult'>('kid');
     const [success, setSuccess] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -20,12 +21,14 @@ const CreateStudentForm: React.FC = () => {
                 name,
                 beltGrade,
                 dob: formatDateForBackend(dob),
+                studentType,
             });
 
             setSuccess('Student created successfully!')
             setName('');
             setBeltGrade('');
             setDob('');
+            setStudentType('kid');
         } catch (err: any) {
             setError(err.response?.data || 'Failed to create student')
             console.error('Error creating student:', err)
@@ -73,6 +76,34 @@ const CreateStudentForm: React.FC = () => {
                         onChange={(e) => setDob(e.target.value)}
                         required
                     />
+                </div>
+
+                <div>
+                    <label className="block font-medium mb-1">Student Type</label>
+                    <div className="flex gap-4">
+                        <label className="flex items-center">
+                            <input
+                                type="radio"
+                                name="studentType"
+                                value="kid"
+                                checked={studentType === 'kid'}
+                                onChange={() => setStudentType('kid')}
+                                className="mr-2"
+                            />
+                            Kid
+                        </label>
+                        <label className="flex items-center">
+                            <input
+                                type="radio"
+                                name="studentType"
+                                value="adult"
+                                checked={studentType === 'adult'}
+                                onChange={() => setStudentType('adult')}
+                                className="mr-2"
+                            />
+                            Adult
+                        </label>
+                    </div>
                 </div>
 
                 <button
