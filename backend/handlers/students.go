@@ -111,6 +111,7 @@ func DeleteStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		studentID, err := helpers.GetStudentURLID(r)
 		if err != nil {
+			log.Printf("invalid student ID %w", err)
 			http.Error(w, "Invalid student ID", http.StatusBadRequest)
 			return
 		}

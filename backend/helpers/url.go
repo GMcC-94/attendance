@@ -9,7 +9,7 @@ import (
 )
 
 func GetStudentURLID(r *http.Request) (int, error) {
-	studentIDStr := chi.URLParam(r, "studentID")
+	studentIDStr := chi.URLParam(r, "id")
 	studentID, err := strconv.Atoi(studentIDStr)
 	if err != nil {
 		return 0, fmt.Errorf("error extracting studentID from URL param %w", err)

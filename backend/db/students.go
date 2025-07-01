@@ -23,6 +23,11 @@ type PostgresStudentStore struct {
 	DB *sql.DB
 }
 
+// THIS FILE JUST STORES INFORMATION INTO A DATABASE.
+
+// func stands for FUNCTION that is telling the program to do something.
+// In this case, I'm creating a Student for the club and I require there to be a
+// NAME, BELT GRADE AND DATE OF BIRTH FOR A STUDENT
 func (p *PostgresStudentStore) CreateStudent(name, beltGrade string, dateOfBirth time.Time) error {
 	_, err := p.DB.Exec("INSERT INTO students (name, belt_grade, dob) VALUES ($1, $2, $3)", name, beltGrade, dateOfBirth)
 
