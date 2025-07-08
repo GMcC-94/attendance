@@ -23,6 +23,7 @@ func main() {
 	refreshTokenStore := &db.PostgresRefreshTokenStore{DB: sqlDB}
 	studentStore := &db.PostgresStudentStore{DB: sqlDB}
 	attendanceStore := &db.PostgresAttendanceStore{DB: sqlDB}
+	imageStore := &db.PostgresImageStore{DB: sqlDB}
 
 	r := chi.NewRouter()
 
@@ -44,7 +45,8 @@ func main() {
 		r.Get("/students/{id}/attendance", handlers.GetStudentAttendanceByIDHandler(attendanceStore))
 
 		// Image upload
-		r.Post("/logo", handlers.UploadLogoHandler())
+		r.Post("/logo", handlers.UploadLogoHandler(imageStore))
+		r.Get("/api/v1/logo", handlers.GetLatestLogoHandler(imageStore))
 
 	})
 
