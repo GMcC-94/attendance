@@ -3,19 +3,18 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/gmcc94/attendance-go/config"
 	"github.com/gmcc94/attendance-go/db"
 	"github.com/gmcc94/attendance-go/handlers"
+	"github.com/gmcc94/attendance-go/helpers"
 	"github.com/go-chi/chi/v5"
 )
 
 func main() {
 
 	config.LoadConfig()
-
+	helpers.InitS3()
 	sqlDB := db.InitDB()
 	defer sqlDB.Close()
 
@@ -46,19 +45,8 @@ func main() {
 
 		// Image upload
 		r.Post("/logo", handlers.UploadLogoHandler(imageStore))
-		r.Get("/api/v1/logo", handlers.GetLatestLogoHandler(imageStore))
 
 	})
-
-	uploadsDir := http.Dir("../uploads")
-	fs := http.FileServer(uploadsDir)
-	r.Handle("/uploads/*", http.StripPrefix("/uploads", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Serving static file:", r.URL.Path)
-		fs.ServeHTTP(w, r)
-	})))
-
-	cwd, _ := os.Getwd()
-	log.Println("Serving uploads from:", filepath.Join(cwd, "../uploads"))
 
 	log.Println("Server starting on port :8080")
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", r))
