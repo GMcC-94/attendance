@@ -36,8 +36,7 @@ func CreateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
 			"message": "Student created successfully",
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+		helpers.WriteJSON(w, http.StatusOK, response)
 	}
 }
 
@@ -59,8 +58,8 @@ func GetAllStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
 				Age:       helpers.CalculateAge(s.DateOfBirth),
 			})
 		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+
+		helpers.WriteJSON(w, http.StatusOK, response)
 	}
 }
 
@@ -84,8 +83,8 @@ func GetAllAdultStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
 				StudentType: s.StudentType,
 			})
 		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+
+		helpers.WriteJSON(w, http.StatusOK, response)
 	}
 }
 
@@ -109,8 +108,8 @@ func GetAllKidStudentsHandler(studentStore db.StudentStore) http.HandlerFunc {
 				StudentType: s.StudentType,
 			})
 		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+
+		helpers.WriteJSON(w, http.StatusOK, response)
 	}
 }
 
@@ -151,9 +150,7 @@ func UpdateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(updatedStudent)
+		helpers.WriteJSON(w, http.StatusOK, updatedStudent)
 	}
 }
 

@@ -32,7 +32,7 @@ func RefreshTokenHandler(rTokenStore *db.PostgresRefreshTokenStore) http.Handler
 			return
 		}
 
-		json.NewEncoder(w).Encode(map[string]string{
+		helpers.WriteJSON(w, http.StatusOK, map[string]string{
 			"access_token": newAccessToken,
 		})
 	}

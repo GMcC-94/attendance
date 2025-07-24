@@ -1,13 +1,13 @@
 package handlers
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gmcc94/attendance-go/db"
+	"github.com/gmcc94/attendance-go/helpers"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -53,8 +53,7 @@ func CreateAttendanceHandler(attendanceStore db.AttendanceStore) http.HandlerFun
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
+		helpers.WriteJSON(w, http.StatusOK, map[string]string{
 			"message": "Attendance recorded successfully",
 			"date":    now.Format("02/01/2006"),
 			"day":     currentDay,
@@ -80,7 +79,6 @@ func GetStudentAttendanceByIDHandler(attendanceStore db.AttendanceStore) http.Ha
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(attendanceResp)
+		helpers.WriteJSON(w, http.StatusOK, attendanceResp)
 	}
 }

@@ -32,8 +32,7 @@ func SignupHandler(userStore db.UserStore) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
+		helpers.WriteJSON(w, http.StatusOK, map[string]string{
 			"message":      "User signed up successfully",
 			"access_token": accessToken,
 		})
@@ -77,8 +76,7 @@ func LoginHandler(
 			http.Error(w, "error saving refresh token", http.StatusInternalServerError)
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
+		helpers.WriteJSON(w, http.StatusOK, map[string]string{
 			"message":       "User successfully logged in",
 			"access_token":  accessToken,
 			"refresh_token": refreshToken,

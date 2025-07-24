@@ -53,8 +53,7 @@ func UploadLogoHandler(imageStore db.ImageStore) http.HandlerFunc {
 			return
 		}
 
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(fmt.Sprintf(`{"url": "%s"}`, url)))
+		helpers.WriteJSON(w, http.StatusOK, []byte(fmt.Sprintf(`{"url": "%s"}`, url)))
 	}
 }
 
@@ -66,8 +65,6 @@ func GetLogoHandler(imageStore db.ImageStore) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(fmt.Sprintf(`{"fileURL": "%s"}`, image.FileURL)))
+		helpers.WriteJSON(w, http.StatusOK, []byte(fmt.Sprintf(`{"fileURL": "%s"}`, image.FileURL)))
 	}
 }
