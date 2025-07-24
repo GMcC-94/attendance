@@ -8,7 +8,7 @@ import (
 
 type ImageStore interface {
 	SaveImage(img types.Image) error
-	GetLatestLogo() (types.Image, error)
+	GetImageByType(imgType string) (types.Image, error)
 }
 
 type PostgresImageStore struct {
@@ -17,20 +17,20 @@ type PostgresImageStore struct {
 
 func (p *PostgresImageStore) SaveImage(img types.Image) error {
 	_, err := p.DB.Exec(`
-		INSERT INTO images (file_name, file_path, type)
-		VALUES ($1, $2, $3)
-	`, img.FileName, img.FilePath, img.Type)
+		INSERT INTO images (file_name, file_url, type, uploaded_at)
+		VALUES ($1, $2, $3, $4)
+	`, img.FileName, img.FileURL, img.Type, img.UploadedAt)
 	return err
 }
 
-func (p *PostgresImageStore) GetLatestLogo() (types.Image, error) {
+func (p *PostgresImageStore) GetImageByType(imageType string) (types.Image, error) {
 	var img types.Image
 	err := p.DB.QueryRow(`
-		SELECT id, file_name, file_path, type, uploaded_at
+		SELECT id, file_name, file_url, type
 		FROM images
-		WHERE type = 'logo'
+		WHERE type = $1
 		ORDER BY uploaded_at DESC
 		LIMIT 1
-	`).Scan(&img.ID, &img.FileName, &img.FilePath, &img.Type, &img.UploadedAt)
+	`, imageType).Scan(&img.ID, &img.FileName, &img.FileURL, &img.Type)
 	return img, err
 }

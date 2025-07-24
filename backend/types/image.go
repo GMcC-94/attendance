@@ -5,7 +5,7 @@ import "time"
 type Image struct {
 	ID         int       `json:"id"`
 	FileName   string    `json:"fileName"`
-	FilePath   string    `json:"filePath"`
+	FileURL    string    `json:"fileUrl"`
 	Type       string    `json:"type"`
 	UploadedAt time.Time `json:"uploadedAt"`
 }

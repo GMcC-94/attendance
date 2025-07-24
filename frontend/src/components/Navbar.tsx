@@ -5,8 +5,8 @@ export default function Navbar() {
   const [logoPath, setLogoPath] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get<{ fileName: string }>("/api/v1/logo")
-      .then((res) => setLogoPath("/uploads/" + res.data.fileName))
+    axios.get<{ fileURL: string }>("/api/v1/logo")
+      .then((res) => setLogoPath("/uploads/" + res.data.fileURL))
       .catch(() => setLogoPath(null));
   }, []);
 
@@ -47,7 +47,6 @@ export default function Navbar() {
                 </ul>
               </details>
             </li>
-            <li><a href="/upload-logo">Upload Logo</a></li>
           </ul>
         </div>
         <div className="navbar-end">

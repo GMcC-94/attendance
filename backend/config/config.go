@@ -4,30 +4,26 @@ import (
 	"log"
 	"os"
 
+	"github.com/gmcc94/attendance-go/types"
 	"github.com/joho/godotenv"
 )
 
-type Config struct {
-	JWTSecret string
-	DBHost    string
-	DBPort    string
-	DBUser    string
-	DBPass    string
-	DBName    string
-}
-
-var AppConfig *Config
+var AppConfig *types.Config
 
 func LoadConfig() {
 	_ = godotenv.Load()
 
-	AppConfig = &Config{
-		JWTSecret: getEnv("JWT_SECRET"),
-		DBHost:    getEnv("DB_HOST"),
-		DBPort:    getEnv("DB_PORT"),
-		DBUser:    getEnv("DB_USER"),
-		DBPass:    getEnv("DB_PASS"),
-		DBName:    getEnv("DB_NAME"),
+	AppConfig = &types.Config{
+		JWTSecret:          getEnv("JWT_SECRET"),
+		DBHost:             getEnv("DB_HOST"),
+		DBPort:             getEnv("DB_PORT"),
+		DBUser:             getEnv("DB_USER"),
+		DBPass:             getEnv("DB_PASS"),
+		DBName:             getEnv("DB_NAME"),
+		AWSRegion:          getEnv("AWS_REGION"),
+		AWSBucketName:      getEnv("AWS_BUCKET_NAME"),
+		AWSSecretAccessKey: getEnv("AWS_SECRET_ACCESS_KEY"),
+		AWSAccessKeyID:     getEnv("AWS_ACCESS_KEY_ID"),
 	}
 }
 

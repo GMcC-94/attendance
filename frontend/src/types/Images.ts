@@ -5,3 +5,7 @@ export interface Image {
   type: string;
   uploadedAt: string;
 }
+
+export interface LogoUploadResponse {
+  url: string;
+}

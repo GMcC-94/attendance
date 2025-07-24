@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS images (
     id SERIAL PRIMARY KEY,
     file_name TEXT NOT NULL,
-    file_path TEXT NOT NULL,
+    file_url TEXT NOT NULL,
     type TEXT NOT NULL,
     uploaded_at TIMESTAMP DEFAULT NOW()
 );

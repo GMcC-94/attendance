@@ -45,6 +45,7 @@ func main() {
 
 		// Image upload
 		r.Post("/logo", handlers.UploadLogoHandler(imageStore))
+		r.Get("/logo", handlers.GetLogoHandler(imageStore))
 
 	})
 
