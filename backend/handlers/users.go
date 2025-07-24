@@ -13,7 +13,8 @@ import (
 func SignupHandler(userStore db.UserStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var credentials types.Credentials
-		json.NewDecoder(r.Body).Decode(&credentials)
+		helpers.DecodeJSON(r, w, &credentials)
+		// json.NewDecoder(r.Body).Decode(&credentials)
 
 		if err := helpers.ValidateStruct(credentials); err != nil {
 			http.Error(w, "Invalid input: "+err.Error(), http.StatusBadRequest)

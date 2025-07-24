@@ -14,10 +14,8 @@ import (
 func CreateStudentHandler(studentStore db.StudentStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.CreateStudentRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid input", http.StatusBadRequest)
-			return
-		}
+
+		helpers.DecodeJSON(r, w, &req)
 
 		dob, err := time.Parse("02/01/2006", req.DateOfBirth)
 		if err != nil {
