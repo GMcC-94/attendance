@@ -53,53 +53,70 @@ const StudentAttendanceList: React.FC = () => {
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Take Attendance for {currentDay}</h1>
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Students</h2>
-        <div className="flex gap-4 mb-4">
-          <button
-            className={`px-4 py-2 rounded ${filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-            onClick={() => setFilter('all')}
-          >
-            All
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${filter === 'adults' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-            onClick={() => setFilter('adults')}
-          >
-            Adults
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${filter === 'kids' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-            onClick={() => setFilter('kids')}
-          >
-            Kids
-          </button>
-        </div>
+     <div className="p-6 bg-gray-900 text-white rounded-lg shadow max-w-4xl mx-auto">
+  <h2 className="text-2xl font-bold mb-4">Students</h2>
+  <div className="flex gap-3 mb-6">
+    <button
+      className={`px-4 py-2 rounded transition ${
+        filter === 'all'
+          ? 'bg-blue-600 text-white hover:bg-blue-700'
+          : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+      }`}
+      onClick={() => setFilter('all')}
+    >
+      All
+    </button>
+    <button
+      className={`px-4 py-2 rounded transition ${
+        filter === 'adults'
+          ? 'bg-blue-600 text-white hover:bg-blue-700'
+          : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+      }`}
+      onClick={() => setFilter('adults')}
+    >
+      Adults
+    </button>
+    <button
+      className={`px-4 py-2 rounded transition ${
+        filter === 'kids'
+          ? 'bg-blue-600 text-white hover:bg-blue-700'
+          : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+      }`}
+      onClick={() => setFilter('kids')}
+    >
+      Kids
+    </button>
+  </div>
 
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="text-left py-2 px-4">Student Name</th>
-              <th className="text-left py-2 px-4">Mark</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((student) => (
-              <tr key={student.id} className="border-b">
-                <td className="py-2 px-4">{student.name}</td>
-                <td className="py-2 px-4">
-                  <input
-                    type="checkbox"
-                    disabled={marked[student.id]}
-                    checked={marked[student.id] || false}
-                    onChange={() => handleAttendance(student.id)}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+  <table className="w-full border-collapse">
+    <thead>
+      <tr className="bg-gray-800">
+        <th className="text-left py-3 px-4 font-semibold text-gray-200">Student Name</th>
+        <th className="text-left py-3 px-4 font-semibold text-gray-200">Mark</th>
+      </tr>
+    </thead>
+    <tbody>
+      {students.map((student, idx) => (
+        <tr
+          key={student.id}
+          className={`${idx % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700'} border-b border-gray-600`}
+        >
+          <td className="py-3 px-4">{student.name}</td>
+          <td className="py-3 px-4">
+            <input
+              type="checkbox"
+              className="w-5 h-5 accent-blue-600"
+              disabled={marked[student.id]}
+              checked={marked[student.id] || false}
+              onChange={() => handleAttendance(student.id)}
+            />
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
     </div>
 
   );
