@@ -23,6 +23,7 @@ func main() {
 	studentStore := &db.PostgresStudentStore{DB: sqlDB}
 	attendanceStore := &db.PostgresAttendanceStore{DB: sqlDB}
 	imageStore := &db.PostgresImageStore{DB: sqlDB}
+	accountsStore := &db.PostgresAccountsStore{DB: sqlDB}
 
 	r := chi.NewRouter()
 
@@ -43,10 +44,13 @@ func main() {
 		r.Post("/students/{id}/attendance", handlers.CreateAttendanceHandler(attendanceStore))
 		r.Get("/students/{id}/attendance", handlers.GetStudentAttendanceByIDHandler(attendanceStore))
 
-		// Image upload
+		// Image Routes
 		r.Post("/logo", handlers.UploadLogoHandler(imageStore))
 		r.Get("/logo", handlers.GetLogoHandler(imageStore))
 
+		// Accounts Routes
+		r.Post("/accounts", handlers.CreateAccountsHandler(accountsStore))
+		r.Get("/accounts", handlers.GetGroupedAccountsHandler(accountsStore))
 	})
 
 	log.Println("Server starting on port :8080")
