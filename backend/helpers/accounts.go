@@ -1,7 +1,9 @@
 package helpers
 
 import (
+	"errors"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/gmcc94/attendance-go/types"
@@ -83,4 +85,16 @@ func BuildGroupedResponse(grouped map[int]map[int]map[string][]types.AccountEntr
 	}
 
 	return result
+}
+
+func ValidateEntries(entries []types.AccountEntry) error {
+	for _, e := range entries {
+		if strings.TrimSpace(e.Description) == "" {
+			return errors.New("description cannot be empty")
+		}
+		if e.Amount <= 0 {
+			return errors.New("amount must be greater than 0")
+		}
+	}
+	return nil
 }

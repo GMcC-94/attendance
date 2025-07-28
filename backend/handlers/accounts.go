@@ -15,6 +15,15 @@ func CreateAccountsHandler(accountsStore db.AccountsStore) http.HandlerFunc {
 			return
 		}
 
+		if err := helpers.ValidateEntries(req.Income); err != nil {
+			helpers.JSONError(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		if err := helpers.ValidateEntries(req.Expenditure); err != nil {
+			helpers.JSONError(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		if err := accountsStore.AddAccountEntries(req.Income, "income"); err != nil {
 			helpers.JSONError(w, http.StatusInternalServerError, "Failed to insert incomes")
 			return

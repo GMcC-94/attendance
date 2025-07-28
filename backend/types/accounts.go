@@ -25,7 +25,7 @@ type GroupedAccounts struct {
 }
 
 type GroupedMonthAccounts struct {
-	Month   int                  `json:"month"`
+	Month   string               `json:"month"`
 	Entries []GroupedDayAccounts `json:"entries"`
 }
 
