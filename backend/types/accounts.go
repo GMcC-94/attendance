@@ -1,13 +1,16 @@
 package types
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type AccountEntry struct {
-	ID          int       `json:"id"`
-	Description string    `json:"description"`
-	Amount      float64   `json:"amount"`
-	Category    string    `json:"category"` // income or expenditure
-	CreatedAt   time.Time `json:"createdAt"`
+	ID          int         `json:"id"`
+	Description string      `json:"description"`
+	Amount      json.Number `json:"amount"`
+	Category    string      `json:"category"` // income or expenditure
+	CreatedAt   time.Time   `json:"createdAt"`
 }
 
 type CreateAccountsRequest struct {

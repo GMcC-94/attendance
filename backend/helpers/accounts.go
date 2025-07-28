@@ -27,6 +27,9 @@ func GroupedAccounts(entries []types.AccountEntry) map[int]map[int]map[string][]
 func BuildGroupedResponse(grouped map[int]map[int]map[string][]types.AccountEntry) []types.GroupedAccounts {
 	var result []types.GroupedAccounts
 
+	if len(grouped) == 0 {
+		return []types.GroupedAccounts{} // return empty slice
+	}
 	// --- Sort years ---
 	var years []int
 	for y := range grouped {
@@ -92,7 +95,12 @@ func ValidateEntries(entries []types.AccountEntry) error {
 		if strings.TrimSpace(e.Description) == "" {
 			return errors.New("description cannot be empty")
 		}
-		if e.Amount <= 0 {
+
+		amount, err := e.Amount.Float64()
+		if err != nil {
+			return errors.New("amount must be a valid number")
+		}
+		if amount <= 0 {
 			return errors.New("amount must be greater than 0")
 		}
 	}

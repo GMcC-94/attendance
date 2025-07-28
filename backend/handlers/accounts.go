@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gmcc94/attendance-go/db"
@@ -15,23 +16,27 @@ func CreateAccountsHandler(accountsStore db.AccountsStore) http.HandlerFunc {
 			return
 		}
 
-		if err := helpers.ValidateEntries(req.Income); err != nil {
-			helpers.JSONError(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		if err := helpers.ValidateEntries(req.Expenditure); err != nil {
+		if err := helpers.ValidateEntries(append(req.Income, req.Expenditure...)); err != nil {
+			log.Printf("Validation error :%v", err)
 			helpers.JSONError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		if err := accountsStore.AddAccountEntries(req.Income, "income"); err != nil {
-			helpers.JSONError(w, http.StatusInternalServerError, "Failed to insert incomes")
-			return
+		entries := map[string][]types.AccountEntry{
+			"income":      req.Income,
+			"expenditure": req.Expenditure,
 		}
 
-		if err := accountsStore.AddAccountEntries(req.Expenditure, "expenditure"); err != nil {
-			helpers.JSONError(w, http.StatusInternalServerError, "Failed to insert expenditure")
-			return
+		for category, slice := range entries {
+			if len(slice) == 0 {
+				continue
+			}
+
+			if err := accountsStore.AddAccountEntries(slice, category); err != nil {
+				log.Printf("DB insert error (%s): %v", category, err)
+				helpers.JSONError(w, http.StatusInternalServerError, "Failed to insert "+category)
+				return
+			}
 		}
 
 		helpers.WriteJSON(w, http.StatusCreated, types.CreateAccountsResponse{

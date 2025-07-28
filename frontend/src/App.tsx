@@ -7,17 +7,19 @@ import Layout from './components/Layout';
 import StudentAttendanceList from './components/StudentAttendanceList';
 import CreateStudentForm from './components/CreateStudentForm';
 import UploadLogo from './pages/UploadLogo';
+import AccountsPage from './pages/AccountsPage';
 
 function App() {
 
-return (
-   <Router>
+  return (
+    <Router>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route path="attendance" element={<StudentAttendanceList />} />
           <Route path="students" element={<StudentList />} />
           <Route path="students/create" element={<CreateStudentForm />} />
-           <Route path="upload-logo" element={<UploadLogo />} />
+          <Route path="accounts" element={< AccountsPage />} />
+          <Route path="upload-logo" element={<UploadLogo />} />
         </Route>
       </Routes>
     </Router>

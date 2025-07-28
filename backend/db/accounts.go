@@ -23,10 +23,24 @@ func (p *PostgresAccountsStore) AddAccountEntries(entries []types.AccountEntry, 
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
 
+	stmt, err := tx.Prepare(`
+	INSERT INTO club_accounts (description, amount, category, created_at) 
+	VALUES ($1, $2, $3, NOW())`)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
 	for _, e := range entries {
-		if _, err := tx.Exec(`
-		INSERT INTO club_accounts (description, amount, category, created_at)
-		VALUES ($1, $2, $3)`, e.Description, e.Amount, category); err != nil {
+		amount, err := e.Amount.Float64()
+		if err != nil || amount <= 0 {
+			tx.Rollback()
+			return fmt.Errorf("invalid amount for entry: %v", e.Description)
+		}
+
+		_, err = stmt.Exec(e.Description, e.Amount, category)
+		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("failed to insert account entry: %w", err)
 		}

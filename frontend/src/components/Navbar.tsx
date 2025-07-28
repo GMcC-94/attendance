@@ -1,15 +1,5 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export default function Navbar() {
-  const [logoPath, setLogoPath] = useState<string | null>(null);
-
-  useEffect(() => {
-    axios.get<{ fileURL: string }>("/api/v1/logo")
-      .then((res) => setLogoPath("/uploads/" + res.data.fileURL))
-      .catch(() => setLogoPath(null));
-  }, []);
-
   return (
     <header className="bg-gradient-to-r from-blue-800 to-indigo-800 text-white relative">
       <div className="navbar bg-base-100 shadow-sm">
@@ -29,10 +19,9 @@ export default function Navbar() {
                   <li><a href="/students/create">Add Students</a></li>
                 </ul>
               </li>
-              <li><a>Item 3</a></li>
+              <li><a href="/accounts">Accounts</a></li>
             </ul>
           </div>
-          {logoPath && <img src={logoPath} alt="Logo" className="h-12 w-12" />}
           <a className="btn btn-ghost text-xl">Full Circle Martial Arts</a>
         </div>
         <div className="navbar-center hidden lg:flex">
@@ -47,6 +36,7 @@ export default function Navbar() {
                 </ul>
               </details>
             </li>
+            <li><a href="/accounts">Accounts</a></li>
           </ul>
         </div>
         <div className="navbar-end">
