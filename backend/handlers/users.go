@@ -13,8 +13,9 @@ import (
 func SignupHandler(userStore db.UserStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var credentials types.Credentials
-		helpers.DecodeJSON(r, w, &credentials)
-		// json.NewDecoder(r.Body).Decode(&credentials)
+		if !helpers.DecodeJSON(r, w, &credentials) {
+			return
+		}
 
 		if err := helpers.ValidateStruct(credentials); err != nil {
 			http.Error(w, "Invalid input: "+err.Error(), http.StatusBadRequest)
@@ -77,10 +78,19 @@ func LoginHandler(
 			http.Error(w, "error saving refresh token", http.StatusInternalServerError)
 		}
 
+		http.SetCookie(w, &http.Cookie{
+			Name:     "refresh_token",
+			Value:    refreshToken,
+			HttpOnly: true,
+			Secure:   true,
+			SameSite: http.SameSiteStrictMode,
+			Path:     "/api/v1/refresh",
+			Expires:  expiresAt,
+		})
+
 		helpers.WriteJSON(w, http.StatusOK, map[string]string{
-			"message":       "User successfully logged in",
-			"access_token":  accessToken,
-			"refresh_token": refreshToken,
+			"message":      "User successfully logged in",
+			"access_token": accessToken,
 		})
 	}
 }
