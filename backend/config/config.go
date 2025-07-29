@@ -9,6 +9,7 @@ import (
 )
 
 var AppConfig *types.Config
+var IsDev = os.Getenv("APP_ENV") == "development"
 
 func LoadConfig() {
 	_ = godotenv.Load()

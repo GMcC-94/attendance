@@ -17,7 +17,7 @@ func SignupHandler(userStore db.UserStore) http.HandlerFunc {
 			return
 		}
 
-		if err := helpers.ValidateStruct(credentials); err != nil {
+		if _, err := helpers.ValidateStruct(credentials); err != nil {
 			http.Error(w, "Invalid input: "+err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -49,7 +49,7 @@ func LoginHandler(
 		var credentials types.Credentials
 		json.NewDecoder(r.Body).Decode(&credentials)
 
-		if err := helpers.ValidateStruct(credentials); err != nil {
+		if _, err := helpers.ValidateStruct(credentials); err != nil {
 			http.Error(w, "Invalid input: "+err.Error(), http.StatusBadRequest)
 			return
 		}

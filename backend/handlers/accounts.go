@@ -18,7 +18,7 @@ func CreateAccountsHandler(accountsStore db.AccountsStore) http.HandlerFunc {
 
 		if err := helpers.ValidateEntries(append(req.Income, req.Expenditure...)); err != nil {
 			log.Printf("Validation error :%v", err)
-			helpers.JSONError(w, http.StatusBadRequest, err.Error())
+			helpers.JSONError(w, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
 
@@ -34,14 +34,12 @@ func CreateAccountsHandler(accountsStore db.AccountsStore) http.HandlerFunc {
 
 			if err := accountsStore.AddAccountEntries(slice, category); err != nil {
 				log.Printf("DB insert error (%s): %v", category, err)
-				helpers.JSONError(w, http.StatusInternalServerError, "Failed to insert "+category)
+				helpers.JSONError(w, http.StatusInternalServerError, "Failed to insert "+category, nil)
 				return
 			}
 		}
 
-		helpers.WriteJSON(w, http.StatusCreated, types.CreateAccountsResponse{
-			Message: "Accounts saved successfully",
-		})
+		helpers.JSONSuccess(w, http.StatusCreated, "Accounts saved successfully", nil)
 	}
 }
 
@@ -49,13 +47,13 @@ func GetGroupedAccountsHandler(accountsStore db.AccountsStore) http.HandlerFunc 
 	return func(w http.ResponseWriter, r *http.Request) {
 		entries, err := accountsStore.GetAccounts()
 		if err != nil {
-			helpers.JSONError(w, http.StatusInternalServerError, "Failed to fetch accounts")
+			helpers.JSONError(w, http.StatusInternalServerError, "Failed to fetch accounts", nil)
 			return
 		}
 
 		grouped := helpers.GroupedAccounts(entries)
 		resp := helpers.BuildGroupedResponse(grouped)
 
-		helpers.WriteJSON(w, http.StatusOK, resp)
+		helpers.JSONSuccess(w, http.StatusOK, "", resp)
 	}
 }
