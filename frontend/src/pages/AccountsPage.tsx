@@ -37,40 +37,40 @@ export default function AccountsPage() {
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+        e.preventDefault();
+        setError("");
+        setSuccess("");
 
-    // Remove invalid/empty rows and convert to numbers
-    const cleanedIncome = income
-        .filter(i => i.description.trim() && !isNaN(parseFloat(i.amount)) && parseFloat(i.amount) > 0)
-        .map(i => ({ ...i, amount: parseFloat(i.amount) }));
+        // Remove invalid/empty rows and convert to numbers
+        const cleanedIncome = income
+            .filter(i => i.description.trim() && !isNaN(parseFloat(i.amount)) && parseFloat(i.amount) > 0)
+            .map(i => ({ ...i, amount: parseFloat(i.amount) }));
 
-    const cleanedExpenditure = expenditure
-        .filter(e => e.description.trim() && !isNaN(parseFloat(e.amount)) && parseFloat(e.amount) > 0)
-        .map(e => ({ ...e, amount: parseFloat(e.amount) }));
+        const cleanedExpenditure = expenditure
+            .filter(e => e.description.trim() && !isNaN(parseFloat(e.amount)) && parseFloat(e.amount) > 0)
+            .map(e => ({ ...e, amount: parseFloat(e.amount) }));
 
-    if (cleanedIncome.length === 0 && cleanedExpenditure.length === 0) {
-        setError("Please add at least one valid income or expenditure entry.");
-        return;
-    }
+        if (cleanedIncome.length === 0 && cleanedExpenditure.length === 0) {
+            setError("Please add at least one valid income or expenditure entry.");
+            return;
+        }
 
-    try {
-        await axios.post("/api/v1/accounts", {
-            income: cleanedIncome,
-            expenditure: cleanedExpenditure,
-        });
-        setIncome([{ description: "", amount: "" }]);
-        setExpenditure([{ description: "", amount: "" }]);
-        setSuccess("Accounts added successfully!");
-        fetchAccounts();
-        setView("list");
-        setTimeout(() => setSuccess(""), 3000);
-    } catch (err: any) {
-        console.error("Save failed:", err.response?.data || err.message);
-        setError(err.response?.data?.error || "Failed to save accounts.");
-    }
-};
+        try {
+            await axios.post("/api/v1/accounts", {
+                income: cleanedIncome,
+                expenditure: cleanedExpenditure,
+            });
+            setIncome([{ description: "", amount: "" }]);
+            setExpenditure([{ description: "", amount: "" }]);
+            setSuccess("Accounts added successfully!");
+            fetchAccounts();
+            setView("list");
+            setTimeout(() => setSuccess(""), 3000);
+        } catch (err: any) {
+            console.error("Save failed:", err.response?.data || err.message);
+            setError(err.response?.data?.error || "Failed to save accounts.");
+        }
+    };
 
 
     const fetchAccounts = async () => {
