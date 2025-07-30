@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
@@ -10,7 +10,7 @@ import (
 	"github.com/gmcc94/attendance-go/types"
 )
 
-func SignupHandler(userStore db.UserStore) http.HandlerFunc {
+func CreateUserHandler(userStore db.UserStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var credentials types.Credentials
 		if !helpers.DecodeJSON(r, w, &credentials) {
@@ -22,9 +22,13 @@ func SignupHandler(userStore db.UserStore) http.HandlerFunc {
 			return
 		}
 
-		userID, err := userStore.SignupUser(credentials.Username, credentials.Password)
+		userID, err := userStore.CreateUser(credentials.Username, credentials.Password)
 		if err != nil {
-			http.Error(w, "user registration failed", http.StatusInternalServerError)
+			if errors.Is(err, types.ErrUsernameTaken) {
+				helpers.JSONError(w, http.StatusConflict, "Username already taken", nil)
+				return
+			}
+			helpers.JSONError(w, http.StatusInternalServerError, "User registration failed", nil)
 			return
 		}
 
@@ -47,20 +51,22 @@ func LoginHandler(
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var credentials types.Credentials
-		json.NewDecoder(r.Body).Decode(&credentials)
-
-		if _, err := helpers.ValidateStruct(credentials); err != nil {
-			http.Error(w, "Invalid input: "+err.Error(), http.StatusBadRequest)
+		if !helpers.DecodeJSON(r, w, &credentials) {
 			return
 		}
 
-		userID, err := userStore.AuthenticateUser(credentials.Username, credentials.Password)
+		if fields, err := helpers.ValidateStruct(credentials); err != nil {
+			helpers.JSONError(w, http.StatusUnauthorized, "Invalid Credentials", fields)
+			return
+		}
+
+		user, err := userStore.AuthenticateUser(credentials.Username, credentials.Password)
 		if err != nil {
 			http.Error(w, "invalid credentials", http.StatusUnauthorized)
 			return
 		}
 
-		accessToken, err := helpers.GenerateJWT(userID, 15*time.Minute)
+		accessToken, err := helpers.GenerateJWT(user.ID, 15*time.Minute)
 		if err != nil {
 			http.Error(w, "error generating token", http.StatusInternalServerError)
 			return
@@ -73,7 +79,7 @@ func LoginHandler(
 		}
 
 		expiresAt := time.Now().Add(7 * 24 * time.Hour)
-		err = rTokenStore.SaveRefreshToken(userID, refreshToken, expiresAt)
+		err = rTokenStore.SaveRefreshToken(user.ID, refreshToken, expiresAt)
 		if err != nil {
 			http.Error(w, "error saving refresh token", http.StatusInternalServerError)
 		}

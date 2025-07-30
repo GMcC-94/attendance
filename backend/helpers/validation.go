@@ -42,8 +42,8 @@ func validationMessage(fe validator.FieldError) string {
 	switch fe.Tag() {
 	case "required":
 		return "This field is required"
-	case "email":
-		return "Please enter a valid email address"
+	case "username":
+		return "Please enter a valid username"
 	case "min":
 		return "Must be at least " + fe.Param() + " characters long"
 	case "max":

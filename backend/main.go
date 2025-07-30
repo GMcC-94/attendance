@@ -29,7 +29,7 @@ func main() {
 
 	r.Route("/api/v1", func(r chi.Router) {
 		// Auth Routes
-		r.Post("/signup", handlers.SignupHandler(userStore))
+		r.Post("/signup", handlers.CreateUserHandler(userStore))
 		r.Post("/login", handlers.LoginHandler(userStore, refreshTokenStore))
 
 		// Student Routes
