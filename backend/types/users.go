@@ -8,6 +8,11 @@ type User struct {
 	PasswordHash string `json:"passwordHash" validate:"required,min=6"`
 }
 
+type NewUser struct {
+	Username string
+	Password string
+}
+
 // For API input
 type Credentials struct {
 	Username string `json:"username" validate:"required,alphanum,min=3,max=50"`
