@@ -10,6 +10,10 @@ import (
 	"github.com/gmcc94/attendance-go/types"
 )
 
+type SessionStore interface {
+	CreateSession(userID int) (*types.Session, error)
+}
+
 type PostgresSessionsStore struct {
 	DB            *sql.DB
 	BytesPerToken int
@@ -33,7 +37,7 @@ func (p *PostgresSessionsStore) CreateSession(userID int) (*types.Session, error
 	}
 	row := p.DB.QueryRow(`
 	INSERT INTO sessions (user_id, token_hash)
-	VALUES ($1, $2) ON CONFLIT (user_id) DO
+	VALUES ($1, $2) ON CONFLICT (user_id) DO
 	UPDATE
 	SET token_hash = $2
 	RETURNING id;`, session.UserID, session.TokenHash)

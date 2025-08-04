@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/gmcc94/attendance-go/types"
 )
 
-func CreateUserHandler(userStore db.UserStore) http.HandlerFunc {
+func CreateUserHandler(userStore db.UserStore, sessionStore db.SessionStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var credentials types.Credentials
 		if !helpers.DecodeJSON(r, w, &credentials) {
@@ -32,15 +33,17 @@ func CreateUserHandler(userStore db.UserStore) http.HandlerFunc {
 			return
 		}
 
-		accessToken, err := helpers.GenerateJWT(userID, 15*time.Minute)
+		session, err := sessionStore.CreateSession(userID)
 		if err != nil {
-			http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+			fmt.Println(err)
+			http.Redirect(w, r, "/login", http.StatusNotFound)
 			return
 		}
+		setCookie(w, CookieSession, session.Token)
+		http.Redirect(w, r, "/attendance", http.StatusFound)
 
 		helpers.WriteJSON(w, http.StatusOK, map[string]string{
-			"message":      "User signed up successfully",
-			"access_token": accessToken,
+			"message": "User successfully created",
 		})
 	}
 }

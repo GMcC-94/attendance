@@ -24,12 +24,13 @@ func main() {
 	attendanceStore := &db.PostgresAttendanceStore{DB: sqlDB}
 	imageStore := &db.PostgresImageStore{DB: sqlDB}
 	accountsStore := &db.PostgresAccountsStore{DB: sqlDB}
+	seesionStore := &db.PostgresSessionsStore{DB: sqlDB}
 
 	r := chi.NewRouter()
 
 	r.Route("/api/v1", func(r chi.Router) {
 		// Auth Routes
-		r.Post("/signup", handlers.CreateUserHandler(userStore))
+		r.Post("/signup", handlers.CreateUserHandler(userStore, seesionStore))
 		r.Post("/login", handlers.LoginHandler(userStore, refreshTokenStore))
 
 		// Student Routes
